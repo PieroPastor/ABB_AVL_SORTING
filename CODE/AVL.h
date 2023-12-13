@@ -17,11 +17,15 @@ template <typename T>
 class AVL {
 public:
     AVL();
-    AVL(const AVL& orig);
+    AVL(const AVL&);
     virtual ~AVL();
     void insertar(const T &);
     void mostrarEnOrden();
     void mostrarPreOrden();
+    void mostrarPostOrden();
+    void guardarEnOrden(T *, int);
+    void guardarPreOrden(T *, int);
+    void guardarPostOrden(T *, int);
 private:
     class Nodo{
         public:
@@ -42,19 +46,23 @@ private:
                 friend class AVL;
             };
             Datos *valor;
-            void balancearHaciaIzquierda(class Nodo *& parbol);
-            void balancearHaciaDerecha(class Nodo *& parbol);
-            void balancearIzquierdaDeDerecha(class Nodo *& parbol);
-            void balancearDerechaDeIzquierda(class Nodo *& parbol);
-            int compararAlturas(const class Nodo *hijo1, const class Nodo *hijo2);
-            int max(const class Nodo *hijo1, const class Nodo *hijo2);
+            void balancearHaciaIzquierda(class Nodo *&);
+            void balancearHaciaDerecha(class Nodo *&);
+            void balancearIzquierdaDeDerecha(class Nodo *&);
+            void balancearDerechaDeIzquierda(class Nodo *&);
+            int compararAlturas(const class Nodo *, const class Nodo *);
+            int max(const class Nodo *, const class Nodo *);
             void apilar(const T &);
         friend class AVL;
     };
     Nodo *raiz;
-    bool insertarRecursivo(Nodo *&raiz, const T &valor);
-    void mostrarEnOrdenRecursivo(const Nodo *raiz);
-    void mostrarPreOrdenRecursivo(const Nodo *raiz);
+    bool insertarRecursivo(Nodo *&, const T &);
+    void mostrarEnOrdenRecursivo(const Nodo *);
+    void mostrarPreOrdenRecursivo(const Nodo *);
+    void mostrarPostOrdenRecursivo(const Nodo *);
+    void guardarEnOrdenRecursivo(Nodo *, T *, int&, int);
+    void guardarPreOrdenRecursivo(Nodo *, T *, int&, int);
+    void guardarPostOrdenRecursivo(Nodo *, T *, int&, int);
 };
 
 /******************************************************************************/
@@ -246,6 +254,83 @@ void AVL<T>::mostrarPreOrden(){
     mostrarPreOrdenRecursivo(raiz);
 }
 
+template <typename T>
+void AVL<T>::mostrarPostOrdenRecursivo(const Nodo *raiz){
+    if(raiz == nullptr) return;
+    mostrarPostOrdenRecursivo(raiz->hizq);
+    mostrarPostOrdenRecursivo(raiz->hder);
+    class AVL<T>::Nodo::Datos *p;
+    p = raiz->valor;
+    while(p){
+        cout << p->valor << " ";
+        p = p->sig;
+    }
+}
+
+template <typename T>
+void AVL<T>::mostrarPostOrden(){
+    mostrarPostOrdenRecursivo(raiz);
+}
+
+template <typename T>
+void AVL<T>::guardarEnOrdenRecursivo(Nodo* raiz, T* arr, int &i, int n){
+    if(raiz == nullptr or i >= n) return;
+    guardarEnOrdenRecursivo(raiz->hizq, arr, i, n);
+    class AVL<T>::Nodo::Datos *p;
+    p = raiz->valor;
+    while(p){
+        if(i == n) return;
+        arr[i++] = p->valor;
+        p = p->sig;
+    }
+    guardarEnOrdenRecursivo(raiz->hder, arr, i, n);
+}
+
+template <typename T>
+void AVL<T>::guardarEnOrden(T *arr, int n){
+    int i=0;
+    guardarEnOrdenRecursivo(raiz, arr, i, n);
+}
+
+template <typename T>
+void AVL<T>::guardarPreOrdenRecursivo(Nodo *raiz, T *arr, int &i, int n){
+    if(raiz == nullptr or i >= n) return;
+    class AVL<T>::Nodo::Datos *p;
+    p = raiz->valor;
+    while(p){
+        if(i == n) return;
+        arr[i++] = p->valor;
+        p = p->sig;
+    }
+    guardarPreOrdenRecursivo(raiz->hizq, arr, i, n);
+    guardarPreOrdenRecursivo(raiz->hder, arr, i, n);
+}
+
+template <typename T>
+void AVL<T>::guardarPreOrden(T *arr, int n){
+    int i=0;
+    guardarPreOrdenRecursivo(raiz, arr, i, n);
+}
+
+template <typename T>
+void AVL<T>::guardarPostOrdenRecursivo(Nodo *raiz, T *arr, int &i, int n){
+    if(raiz == nullptr or i >= n) return;
+    guardarPostOrdenRecursivo(raiz->hizq, arr, i, n);
+    guardarPostOrdenRecursivo(raiz->hder, arr, i, n);
+    class AVL<T>::Nodo::Datos *p;
+    p = raiz->valor;
+    while(p){
+        if(i == n) return;
+        arr[i++] = p->valor;
+        p = p->sig;
+    }
+}
+
+template <typename T>
+void AVL<T>::guardarPostOrden(T *arr, int n){
+    int i=0;
+    guardarPostOrdenRecursivo(raiz, arr, i, n);
+}
 
 #endif /* AVL_H */
 
